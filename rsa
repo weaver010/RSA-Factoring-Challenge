@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+check_fact()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                c=0
+                n2=1
+                for a in ${args[*]};
+                do
+                        if [ $c -gt 1 ];
+                        then
+                                n2=$(echo $a*$n2 | bc)
+                        fi
+                        c=$((c + 1))
+                done
+        else
+                n2=$3
+        fi
+
+        n1=$2
+        num=$(echo "$1" | tr ':' '=')
+
+        r=$(echo "if($n2 > $n1) 1 else 0" | bc)
+	        if ((r == 1)); then
+		        numcp=$n1
+		        n1=$n2
+		        n2=$numcp
+                fi
+
+        echo "$num$n1*$n2"
+}
+
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
+else
+
+        while read i
+        do
+
+                r=$(factor "$i")
+                check_fact $r
+
+        done < "$1"
+fi
